@@ -1,0 +1,13 @@
+#1 - 进度条
+	
+    QString sliderStyleSheet = "QSlider{height:8px;}"	//整个滑动条的外观
+                               "QSlider::handle:horizontal{height:8px; width:8px; border-radius:4px; margin:0 -4px; background:\"#57ABEB\";}"	//handle
+                               "QSlider::groove:horizontal{height:4px; border-radius:1px; position:absolute; left:4px; right:4px;}"		//滑动条凹槽
+                               "QSlider::add-page:horizontal{height:4px; border-raidus:1px; background:white;}"		//handle左边的凹槽
+                               "QSlider::sub-page:horizontal{height:4px; border-raidus:1px; background:\"#57ABEB\";}";	//handle右边的凹槽
+
+    QString sliderStyleSheet = "QSlider{height:8px;}"
+                               "QSlider::handle:horizontal{height:8px; width:8px; border-radius:4px; margin:-2px 0; background:\"#57ABEB\";}"
+                               "QSlider::groove:horizontal{height:4px; border-radius:1px; position:absolute; left:4px; right:4px;}"
+                               "QSlider::add-page:horizontal{height:4px; border-raidus:1px; background:white;}"
+                               "QSlider::sub-page:horizontal{height:4px; border-raidus:1px; background:\"#57ABEB\";}";

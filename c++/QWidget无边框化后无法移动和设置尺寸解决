@@ -1,0 +1,34 @@
+#1 - 解决移动问题(方案1)
+
+	在QWidget中重载如下三个函数：
+	    void mousePressEvent(QMouseEvent *event);
+	    void mouseMoveEvent(QMouseEvent *event);
+	    void mouseReleaseEvent(QMouseEvent *event);	
+
+        void VideoPlayer::mousePressEvent(QMouseEvent *event){
+            LOG(INFO)<<"[mousePressEvent] ENTER";
+            if(event->button() == Qt::LeftButton){
+                lastlocation = event->globalPos();
+            }
+            LOG(INFO)<<"[mousePressEvent] EXIT";
+        }
+        
+        void VideoPlayer::mouseMoveEvent(QMouseEvent *event){
+            LOG(INFO)<<"[mouseMoveEvent] ENTER";
+            if(event->button()==Qt::LeftButton){
+                int dx = event->globalX()-lastlocation.x();
+                int dy = event->globalY()-lastlocation.y();
+                lastlocation = event->globalPos();
+                move(x()+dx,y()+dy);
+            }
+            LOG(INFO)<<"[mouseMoveEvent] EXIT";
+        }
+        
+        void VideoPlayer::mouseReleaseEvent(QMouseEvent *event)
+        {
+            int dx = event->globalX() - lastlocation.x();
+            int dy = event->globalY() - lastlocation.y();
+            move(x()+dx, y()+dy);
+        }
+
+	---备注：这个方案比较卡顿，不流畅---

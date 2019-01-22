@@ -1,0 +1,9 @@
+    Rectangle{
+        id:toolBar
+        Image {
+            id: bgimage
+            anchors.fill: parent
+            source: "qrc:/image.png"
+            fillMode: Image.Tile	//有很多种填充方式，具体参照帮助文档
+        }
+    }

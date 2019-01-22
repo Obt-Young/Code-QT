@@ -1,0 +1,5 @@
+A mouse event contains a special accept flag that indicates whether the receiver wants the event. You should call ignore() if the mouse event is not handled b
+y your widget. A mouse event is propagated up the parent widget chain until a widget accepts it with accept(), or an event filter consumes it.
+
+Note: If a mouse event is propagated to a widget for which Qt::WA_NoMousePropagation has been set, that mouse event will not be propagated further up the pare
+nt widget chain.

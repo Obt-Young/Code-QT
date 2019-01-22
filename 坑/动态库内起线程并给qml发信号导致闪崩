@@ -1,0 +1,20 @@
+情景还原：在sip协议栈中起线程，通过回调函数进入qt的c++代码中，并在c++代码组织qt中的数据类，并给qml发信号，在qml中对model
+中插入信号传来的数据，导致程序闪崩
+
+报错：QQmlEngine: Illegal attempt to connect to AlarmInfo(0xd8126e0) that is in a different thread than the QML engine QQmlAp
+plicationEngine(0x6d09cb8.
+
+原因(可能)：从报错来看，是qml engine线程无法获得非qml engine上下文中的数据，可以猜测，如果在动态库中起线程，那么这个线程便
+和qml的engine线程是完全独立的，可以想象成linux的两个进程。然后这两个线程无法互相使用数据内容。
+
+其他现象：如果在qml中仅仅打印回调上传的数据，是没问题的，但是一旦进行qml动作，比如insert一个model，那么就会报错
+
+现象的理解：在qml文件中不使用qml组件，而仅仅使用js语言是不会进入qml上下文，故不会有印象
+
+问题的解决：在动态库进去回调函数后，在回调函数中按照动态库中的数据结构调用qt中c++的随便一个函数，并在这个函数中发射一个
+中间件信号，再创建一个slot函数用来接收这个信号，再在这个slot里面发信号给qml。中间件信号和slot函数需要显示通过connect建立
+链接
+
+猜测：通过connect函数，将数据从动态库线程拷贝到了qml engine中，实现了上下文的切换。故避免了问题
+
+改进：是否有方法在回调函数中直接发信号给qml，还能保证数据可以被应用到qml中?

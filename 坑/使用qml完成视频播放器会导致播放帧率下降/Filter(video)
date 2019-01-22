@@ -1,0 +1,17 @@
+Video Filter也叫视频流过滤器
+
+主要用来对多媒体流进行编辑，这种过滤器可以级联起来使用。
+
+过滤器可以用在视频编码前、编码过程中以及解码后
+
+
+prefilters：用在编码前
+	功能：去噪/调整采样率/对比度增强/deinterlacing/deflicking
+
+intrafilters：编码过程中
+	功能：去卡顿(deblocking)
+
+postfilters：解码后
+	功能：deinterlacing/deblocking/deringing
+
+

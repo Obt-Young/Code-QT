@@ -1,0 +1,25 @@
+QString 转换成char *
+
+QString mmName
+char * szName = mmName.toLatin1().data()
+
+
+QString 转换成char数组
+QString mmName
+char aName[100];
+char * szName = mmName.toLatin1().data()
+memcpy(a,szName,strlen(szName))
+
+
+QString 转换成 string
+QString mmName
+mmName.toStdString()
+
+
+string 转换成 QString
+    string a;
+    QString aa = QString::fromStdString(a);
+
+
+
+同样，也可以从Latin1转换成QString，具体参见QString那一套from

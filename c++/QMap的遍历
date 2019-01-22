@@ -1,5 +1,0 @@
-for(QMap<QString , Addrinfo *>::Iterator iter = map.begin()
-; iter != map.end(); iter ++)
-{
-qDebug() << "key:" << iter.key()<< "value:" << iter.value() << "\n";
-}

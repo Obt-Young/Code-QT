@@ -1,0 +1,43 @@
+
+    ComboBox{
+        id:transtype
+        anchors.right: btn_close.left
+        anchors.rightMargin: 10
+        anchors.top: parent.top
+        anchors.topMargin: 4
+        anchors.bottom: wrapper_chatpage.top
+        anchors.bottomMargin: 4
+        editable: false
+        z:bg_z+1
+        model:[
+            "uncomfirmed",
+            "comfirmed"
+        ]
+        width:100
+
+        Component{	//backgroud接收Component
+            id:cb_bg
+            Rectangle{
+                border.width: 0
+                radius: 4
+
+                Image {
+                    id: drop
+                    anchors.right:parent.right
+                    anchors.rightMargin: -2
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: transtype.hovered?"qrc:/imagesPd200/reports/reports_combo_unfold_hover.png":"qrc:/imagesPd200/reports/reports_combo_unfold_normal.png"//"qrc:/images/combat/form_list_low_s.png"
+                }
+            }
+        }
+
+	//通过ComboBoxStyle来设置ComboBox的样式
+        style:ComboBoxStyle{
+            label: Text{	//显示文本的样式
+                font.pixelSize: 12
+                font.family:myMDCCommand.Language?"微软雅黑":"Arial"
+                text:myMDCCommand.Language?(control.currentText==="uncomfirmed"?"不确认":"待确认"):control.currentText	//显示的内容(不是实际的内容，实际的内容由model决定)
+            }
+            background: cb_bg	//背景的样式(每一个选择条目以及当前选择框)
+        }
+    }

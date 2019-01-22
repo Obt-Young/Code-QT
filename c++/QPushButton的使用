@@ -1,0 +1,6 @@
+#1 - 设置底图
+    QPixmap buttonimage(":/images/history/history_play_h.png");
+    playButton->setIcon(QIcon(buttonimage));				
+
+#2 - 使用stylesheet设置按键风格
+	https://www.cnblogs.com/xj626852095/p/3648119.html

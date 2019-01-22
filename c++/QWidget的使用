@@ -1,0 +1,14 @@
+理论知识参照 ： ../理论/QT Widgets
+
+
+widget的构造函数一般接收两个参数：
+1）QWidget *parent = 0    如果是0(默认)，那么表示当前widget是一个window。否则的话，为当前widget指定parent，当前widget的尺寸将
+                          被其parent锁约束(但是可以通过把widget的flag设置成QT::Window来再次把widget设置成独立的window)。
+
+2）Qt::WindowFlags f = 0  表示当前widget是什么样的widget，是window/subwindow/dialog等等。默认是widget。此时如果无parent，那么
+                          自动表示为window
+
+
+
+
+

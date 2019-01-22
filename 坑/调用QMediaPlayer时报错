@@ -1,0 +1,18 @@
+DirectShowPlayerService::doRender: Unresolved error code xxx
+
+当你发布的qmlproject包含QtMultimedia模块时，运行在一个干净的系统上时，要注意，随时播放失败，因为QtMultimedia使用的系统默认的音视频编/解码器，如果系统没有安装与qt对应的音视频编解码器的话，就会出现
+
+DirectShowPlayerService::doRender: Unresolved error code ****
+
+这个问题从qt4开始到qt5.5，因为新的qt5的QtMultimedia模块会直接使用GStream 
+
+
+解决方法是“安装LAV Filters”
+http://forum.doom9.org/showthread.php?t=156191
+http://files.1f0.de/lavf/LAVFilters-0.65.exe
+
+
+
+
+
+

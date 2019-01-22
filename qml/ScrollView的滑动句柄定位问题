@@ -1,0 +1,28 @@
+ScrollView有两个需要Item值的属性，一个是  contentItem , 还有一个是 flickableItem
+
+
+contentItem  :  ScrollView需要修饰的内容，比如是一个图片，是一个ListView，等等，就是内容主体
+
+flickableItem  :  滑动条的形态，就是那个可以拖动的滑条，通过定义这个属性，可以定制滑条的外观，比如是长方形的还是原型的
+	          甚至可以使图片等等
+
+
+本文要说的定位问题就是 针对 flickableItem的， 这个属性有两个属性： contentX 和 contentY，用来定位滑条左上角的位置
+
+
+比如，我们可以让ScrollView每次呈现的时候，只要有滑条(内容超过ScrollView可容纳的范围)，那么就让他自动定位到最上面
+
+
+ScrollView{
+
+	...
+
+        onVisibleChanged: {
+            scrollView.flickableItem.contentY = 0
+        }
+
+	
+}
+
+
+

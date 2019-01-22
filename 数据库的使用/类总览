@@ -1,0 +1,41 @@
+与数据库操作相关的所以QT类如下：
+
+
+？）QSql                    Contains miscellaneous identifiers used throughout the Qt SQL module
+2）QSqlDatabase            Represents a connection to a database
+1）QSqlDriverCreator        Template class that provides a SQL driver factory for a specific driver type
+1）QSqlDriverCreatorBase    The base class for SQL driver factories
+1）QSqlDriver           Abstract base class for accessing specific SQL databases
+2）QSqlError            SQL database error information
+2）QSqlField            Manipulates the fields in SQL database tables and views
+2）QSqlIndex            Functions to manipulate and describe database indexes
+2）QSqlQuery            Means of executing and manipulating SQL statements
+2）QSqlRecord           Encapsulates a database record
+1）QSqlResult           Abstract interface for accessing data from specific SQL databases
+3）QSqlQueryModel       Read-only data model for SQL result sets
+3）QSqlRelationalTableModel Editable data model for a single database table, with foreign key support
+3）QSqlTableModel          Editable data model for a single database table
+1）QSqlDriverPlugin     Plugin
+
+
+
+上述所有类主要分为三大类：
+1）驱动层           ：      为SQL API 层提供操作各种数据库的通用接口。本层将各种数据库操作的通用操作汇总。
+2）SQL api 层       ：      在驱动层对数据库做了统一封装后，需要易用的接口，SQL API层提供方便使用的接口，这里就已经看不到sql的原样了。
+                            QSqlDatabase用来管理数据库链接
+                            QSqlQuery用来管理数据库操作(增删改查，建表，增加约束等全在这里)
+                            QSqlError, QSqlField, QSqlIndex, and QSqlRecord 用来支撑 QSqlQuery
+3）用户交互层       ：      提供sql数据的存储和展示手段，配合QT的model/view使用，这层主要是用来数据展示，配合M/V模型使用。不涉及任何数据库操作 
+
+
+1层为2层提供通用操作数据库的接口，1层直接调用各个数据库的动态库，是各个数据库动态库的封装层
+    注意：”这层可能直接调用各个数据库的动态库“，如果想直接使用动态库函数，那么请使用本层提供的类
+
+2层为所有数据库操作方式的集合，如果想定制化数据库操作，可以实例化2层的类
+    只要涉及到数据库操作，都使用此层的类来完成
+
+3层提供更QT风格的封装，为2层获得的数据提供落地容器，同时此层的类可以配合QT的各种view来实现M/V模型
+
+
+
+如果想使用上述类，前提是当前应用必须是 QCoreApplication 的

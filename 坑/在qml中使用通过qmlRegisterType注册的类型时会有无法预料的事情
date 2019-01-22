@@ -1,0 +1,39 @@
+通常情况下，我们使用qmlRegisterType来向 qml engine 中注册c++类，按照官方文档的介绍，直接使用就可以了，事实上并非如此！！！
+
+比如，在qml中，我们想创建一个c++实例： 
+ var tmp = myAddrCommand.createFavoriteInfo();
+
+如果我们在c++中的createFavoriteInfo()实现是下面这种：
+FavoriteInfo* AddrCommand::createFavoriteInfo(){
+    return new FavoriteInfo();
+}
+
+那么这时候在qml 中的 var tmp，使用起来是时好时坏的！！！！
+
+我们必须使用如下这种方式来实现：
+FavoriteInfo* AddrCommand::createFavoriteInfo(){
+    QQmlEngine *engine = Utility::createUtilityClass()->qmlEngine();
+    QQmlComponent component(engine, QUrl("qrc:/qml/apis/FavoriteInfo.qml"));
+    FavoriteInfo* info = qobject_cast<FavoriteInfo*>(component.create());
+    if(info!=NULL){
+        return info;
+    }
+}
+
+同时！！！在创建一个qml文件，叫做FavoriteInfo.qml,文件中什么都不要，只要把自己的包import进去就行了
+
+FavoriteInfo.qml
+
+import QtQuick 2.0
+import addrCommand 1.0
+
+FavoriteInfo {
+    id:root
+}
+
+
+
+
+
+
+		

@@ -1,0 +1,68 @@
+qt sql module是QT的一个模块，此模块通过”驱动插件“来和不同数据库的库API建立关系。
+
+由于各个数据库提供的API”肯定“不一样，所以driver层能封装的数据库API一定是有限的，QT提供了比较常用的数据库的API封装，另外一些，可以由用户自己封装。参见How to Write Your Own Database Driver
+
+
+目前QT提供对如下数据库的API封装：
+
+QDB2        IBM DB2 (version 7.1 and above)
+QIBASE      Borland InterBase
+QMYSQL      MySQL
+QOCI        Oracle Call Interface Driver
+QODBC       Open Database Connectivity (ODBC) - Microsoft SQL Server and other ODBC-compliant databases
+QPSQL       PostgreSQL (versions 7.3 and above)
+QSQLITE2    SQLite version 2
+QSQLITE     SQLite version 3
+QTDS        Sybase Adaptive Server
+
+Note: obsolete from Qt 4.7
+注：QT对上述数据库API的封装类中，不是所有类都有源码，这取决于数据库是否开源，以及开源策略是什么样的，比如对oracle操作的类肯定就没有源码，因为对oracle api的再封装和再发布势必违反GPL
+
+
+
+以上数据库的库文件和对应的驱动都已经安装在QT中。直接使用相应的驱动层接口即可。
+
+假如现在有一个新的数据库需要在QT中使用，比如redis，那么就需要找到redis的客户端库文件，然后自己实现驱动层的相应类。从而制作redis的“驱动插件”。
+
+
+=======================================================================================================================================
+
+
+在工程文件中配置数据库的库：和在makefile中增加链接库一样，通过-L指定要链接的库名字，通过-I指定库的头文件路径
+
+
+=======================================================================================================================================
+
+下文介绍如何在Linux和Windows下引各个数据库的库入工程：
+
+
+QSQLITE
+    QT SQLITE插件用来让QT能够使用SQLITE数据库
+    SQLITE是运行时数据库(不需要服务端，直接在客户端把数据库落地成本地文件)，是一种文件数据库，一个数据库实例对应一个文件。如果文件不存在，SQLite会创建，SQLite还有内存模式，即作为内存数据
+库运行。
+    SQLITE在 多用户 和 多会话 场景下有限制和约束。如果多个会话同时读/写同一个资源(行/表/列)，那么程序可能会卡主，直到一个会话commit或者rollback。这是sqlite的一个缺陷。
+    QT针对上述sqlite的缺陷，进行了优化，让程序不会卡主。通过QSqlDatabase::setConnectOptions()来设置一个超时时间，当某个会话一段时间不commit/rollback后，自动超时提交。
+    当select的时候进行update操作也是不行的。这个问题一般会在使用 QSqlTableModel 的时候出现。(所以在有完备的处理机制之前，尽量不使用第3层)
+
+如何构建sqlite插件
+    sqlite 3的库已经被纳入QT中了，所以不需要额外操作。
+    linux&unix  ： 在安装qt的时候，可以通过-plugin-sql-sqlite把sqlite库作为插件安装入qt，也可以-qt-sql-sqlite作为库直接编译进qt中。
+    windows     ： 在qt安装的时候手动选择
+
+如果调整sqlite的库版本
+    qt自带的sqlite库是比较稳定可用的版本，但是可能不是最新的，如果想让qt使用最新的sqlite库，那么可以操作如下：
+    linux&unix  ：    cd $QTDIR/qtbase/src/plugins/sqldrivers/sqlite
+                      qmake "INCLUDEPATH+=$SQLITE/include" "LIBS+=-L$SQLITE/lib -lsqlite"
+                      make
+                      cd $QTDIR/qtbase/src/plugins/sqldrivers/sqlite
+                      make install
+    windows     :     cd %QTDIR%\qtbase\src\plugins\sqldrivers\sqlite
+                      qmake "INCLUDEPATH+=C:/SQLITE/INCLUDE" "LIBS+=C:/SQLITE/LIB/SQLITE3.LIB" sqlite.pro
+                      nmake
+
+
+    
+
+
+
+

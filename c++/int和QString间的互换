@@ -1,0 +1,10 @@
+#1  --  int 转换成 QString
+
+	int a = 10;
+	QString s_a = QString::number(a);
+
+
+#2  --  QString 转换成 int
+
+	QString s = "xxxxx";
+	int i_s = s.toInt();

@@ -1,0 +1,28 @@
+import QtQuick 2.5
+import QtQuick.Window 2.2
+import QtMultimedia 5.6
+
+Window {
+    visible: true
+    width: 640
+    height: 480
+    title: qsTr("Hello World")
+
+    Rectangle {
+        width: 800
+        height: 600
+        color: "black"
+
+        MediaPlayer {
+            id: player
+            source: "F:/81697_20181130162245.mp4"
+            autoPlay: true
+        }
+
+        VideoOutput {
+            id: videoOutput
+            source: player
+            anchors.fill: parent
+        }
+    }
+}

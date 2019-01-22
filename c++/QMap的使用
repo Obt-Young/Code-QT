@@ -1,0 +1,34 @@
+QMap的遍历：
+
+for(QMap<QString , Addrinfo *>::Iterator iter = map.begin()
+; iter != map.end(); iter ++)
+{
+qDebug() << "key:" << iter.key()<< "value:" << iter.value() << "\n";
+}
+
+=====================================================================================================================
+
+如果QMap中已经有 key1， 那么再往map中使用insert和operator[],则会覆盖原来的值。
+
+如果想让一个key对应多个值，那么可以使用insertMulti代替insert，这样的话就可以实现不覆盖原值。那么在访问的时候可以这样：
+  QList<int> values = map.values("plenty");
+  for (int i = 0; i < values.size(); ++i)
+      cout << values.at(i) << endl;
+可见，是通过QList来存储 “一个key多个value”
+
+=====================================================================================================================
+
+那么既然是一个key对应多个value的情况，该如何遍历所有的value呢，实际上可以直接通过iterator来实现
+
+
+    LOG(INFO)<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+    QMap<QString,QString> tmp;
+    tmp["a"] = "a_1";
+    tmp.insertMulti("a","a_2");
+    for(QMap<QString,QString>::iterator it  = tmp.begin();it!=tmp.end();it++)
+    {
+        LOG(INFO)<<it.value().toStdString();
+    }
+    LOG(INFO)<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+	以上程序会输出 a_2 a_1，可见是成功遍历了，但是顺序是倒过来的，这点需要深入研究下内部存储结构！！！

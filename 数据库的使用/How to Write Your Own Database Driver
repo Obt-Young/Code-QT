@@ -1,0 +1,47 @@
+QSqlDatabase负责加载和管理 各个数据库的“驱动插件”。
+
+当使用QSqlDatabase::addDatabase()来加载某个数据库时，比如QSqlDatabase::addDatabase(“QSQLITE”)，SQLITE的驱动插件已经与QSqlDatabase实例关联起来了。
+
+注意：
+QSqlDriver是一个“抽象基类”，此类由各个“驱动插件”来实现，比如sqlite的驱动插件就是QSqlDriver的子类。这个基类定义了作为一个“驱动插件”必须要实现哪些接口。
+QSqlDatabase是QSqlDriver的一个实现，一般理解为QSqlDatabase实现并包装了QSqlDriver，是其子类，但是功能远超QSqlDriver
+
+
+如果想使用数据库的库中某个特定的函数 ，那么在“驱动插件”中创建一个QSqlQuery 实例调用特定的函数。
+
+QSqlDatabase类中的函数依赖于QSqlDriver
+(QSqlDriver是驱动插件的基类，驱动插件实现QSqlDriver后，作为QSqlDatabase创建数据库实例函数的一个参数提供给QSqlDatabase使用，从而实例化一个使用特定QSqlDriver实例作为
+驱动的数据库实例QSqlDatabase_x)
+
+比如 QSqlDatabase 的 创建并指定数据库实例的函数为 
+QSqlDatabase    addDatabase(QSqlDriver *driver, const QString &connectionName = QLatin1String( defaultConnection ))
+获取当前数据库实例使用哪个驱动的函数为
+QSqlDriver *driver() const
+
+
+小结：       1）QSqlDatabase用来创建数据库实例容器，构造时还没指定这个容器是用来操作什么数据库，此时需要通过QSqlDatabase::addDatabase()来指定当前容器用来操作那种数据库。
+             2）在使用addDatabase时，如果仅仅使用一个参数的addDatabase，则默认使用qt自带的对应的驱动插件，比如“QSQLITE”就使用自带的sqlite插件。如果不想使用自带的插件，那么
+                在addDatabase时指定使用何种插件————QSqlDatabase addDatabase(QSqlDriver *driver, const QString &connectionName = QLatin1String( defaultConnection ))
+             3）addDatabase的第一个参数是QSqlDriver *driver，表明要一个QSqlDriver实例，所以我们要提供，因为QSqlDriver 是一个接口类，所以我们要继承并实现这个接口类，即我们
+                要实现自己的驱动插件。
+             4）至此创建并使用一个数据库的动作就全部完成了。    创建容器-->指定数据库类型 & 指定数据库驱动-->(容器特例话)-->得到“具有指定驱动的用来操作sqlite数据库的QSqlDatabase实例”
+
+
+
+
+
+QSqlResult也是一个“抽象基类”，此类定义数据库该有的基本操作，比如增删改查
+QSqlQuery是QSqlResult的一个实现。在实现了基本接口的基础上，还增加了很多附加方法。
+
+
+当实现一个驱动插件的时候，既要实现QSqlDriver，又要实现QSqlResult，同时还要实现二者内的所有虚函数接口
+一般的风格见C:\Qt\Qt5.6.2\5.6\Src\qtbase\src\sql\drivers\sqlite
+
+
+一般是在h文件中定义驱动的类名字并继承QSqlDriver类，然后在cpp文件中实现驱动类，同时在在cpp文件中实现QSqlResult。
+
+
+result一般作为driver的友元类。
+
+
+所以在使用的时候，创建QSqlDriver给QSqlDatabase使用

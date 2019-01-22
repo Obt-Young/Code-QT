@@ -1,0 +1,26 @@
+std::string Utility::Unicode2PinYin(const QString& unicode){
+    QTextCodec *gbk = QTextCodec::codecForName("gbk");
+    QByteArray qa_gbk = gbk->fromUnicode(unicode);
+    return getLetter(qa_gbk.toStdString());
+}
+
+
+/*getLetter函数参考Code-Cpp/字符串处理及string类的使用/gbk编码的汉字转拼音*/
+
+
+
+使用：
+
+QString pinyin_name = QString::fromStdString(p_u->Unicode2PinYin(name));
+//pinyin_name为中文全拼
+//name入参为QString类型的字符串，需要是unicode编码
+
+
+说明：
+对于QT来说，默认的汉字编码就是unicode的，不论是从sqlite中取出来的utf-8，还是从别的地方获取的utf-16等等。只要落入qt的QString，那么就会自动转化成unicode
+所以在使用QTextCodec的时候，一般就是直接fromUnicode。
+
+
+
+
+

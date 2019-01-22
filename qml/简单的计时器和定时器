@@ -1,0 +1,357 @@
+
+www.cnblogs.com/suRimn/p/10178930.html
+
+
+/*
+author:狐狸家的鱼
+date:20181226
+*/
+import QtQuick 2.10
+import QtQuick.Window 2.10
+import QtQuick.Controls 2.2
+Window {
+    visible: true
+    width: 640
+    height: 480
+    title: qsTr("Hello World")
+    property int initTime: 0
+    property var totalSeconds_ipt    //timerIpt 总秒数
+    property var totalSeconds_sys    //当前系统时间总秒数
+    property var trigger_ipt
+    property int count: 15           //倒计时开始秒数
+    //秒转换为时分秒  用于计时
+    function toTime(s){
+        var time;
+        if(s > -1){
+            var hour = Math.floor(s/3600);
+            var min = Math.floor((s/60)%60);
+            var sec = initTime % 60;
+            if(hour < 10){
+                time = hour + ":";
+            }
+            if(min < 10){
+                time += "0";
+            }
+            time += min + ":";
+            if(sec < 10){
+                time += "0";
+            }
+            time += sec.toFixed(0);
+        }
+        return time;
+    }
+
+    //时分秒转换为秒 用于定时
+    function add_zero(temp){
+        if(temp < 10) return "0" + temp;
+
+    }
+    function getCurDateS(){
+        var date = new Date();
+        var dateH = add_zero(date.getHours());
+        var dateM = add_zero(date.getMinutes());
+        var dateS = add_zero(date.getSeconds());
+        totalSeconds_sys = dateH*3600 + dateM*60 + dateS*1;
+        return totalSeconds_sys;
+    }
+
+    //计时器
+    Timer{
+        id:timer_1
+        interval: 1000
+        repeat: true
+        triggeredOnStart: true //start()时触发
+        onTriggered: {//触发器
+            initTime++
+            timeTex.text = toTime(initTime)
+        }
+    }
+
+    //定时器
+    Timer{
+        id:timer_2
+        interval: 1000
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            getCurDateS()
+            trigger_ipt = totalSeconds_ipt - totalSeconds_sys
+            if(trigger_ipt === count){
+                warnMsgPop.open();//告警窗口打开
+                //warnMusic.play();//告警音乐播放
+                count -= 1;
+                if(count <= 0){
+                    timer_2.stop();
+                }
+            }
+        }
+    }
+
+
+    //触发按钮
+    Button{
+        id:triggerBtn
+        width: 100
+        height: 30
+        anchors.centerIn: parent
+        text: 'trigger'
+        MouseArea{
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.MidButton | Qt.RightButton
+            onClicked: {
+                if(mouse.button == Qt.LeftButton){//左键触发计时器 & 清零
+                    console.log("clicked LeftButton")
+                    initTime = 0
+                    timer_1.start()
+                }
+                if(mouse.button == Qt.MidButton){//中键停止计时器
+                    console.log("clicked MidButton")
+                    timer_1.stop()
+                }
+                if(mouse.button == Qt.RightButton){//右键触发定时器
+                    console.log("clicked RightButton")
+                    //timer_1.stop()
+                    //timeTex.text = '' //计时清空
+                    timeIptPop.open()
+                }
+            }
+        }
+    }
+    Text{
+        id:timeTex
+        font.pointSize: 20
+        anchors.bottom: triggerBtn.top
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#333"
+    }
+    Text{
+        id:countDownTex
+        font.pointSize: 20
+        anchors.top: triggerBtn.bottom
+        anchors.topMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: "#333"
+    }
+
+    //弹出定时器时间输入和告警提示信息窗口
+    Popup{
+        id:timeIptPop
+        width: 210
+        height: 200
+        x:triggerBtn.x + triggerBtn.width
+        y:triggerBtn.y - triggerBtn.height/2
+        TimeIpt{
+            id:timeIptWin
+            anchors.fill: parent
+        }
+    }
+
+    WarnPop{//倒计时告警窗口
+        id:warnMsgPop
+        x:triggerBtn.x - triggerBtn.width
+        y:triggerBtn.y
+        width: 200
+        height: 200
+        warnText:timeIptWin.warnMsgInput + "\n" + (count <= 0 ? "End of countdown" : count)
+    }
+    //时间输入
+    Connections{//弹出时间输入的确认按钮
+        target: timeIptWin.confirmBtnArea
+        onClicked:{
+            var hhmmIpt = timeIptWin.timeInputText.replace(":","");
+            var hhIpt_before = hhmmIpt.substring(0,2);
+            var mmIpt_before = hhmmIpt.substring(2,4);
+            var hhIpt_after = parseInt(hhIpt_before,10);
+            var mmIpt_after = parseInt(mmIpt_before,10);
+            console.log("转换前：",hhIpt_before,mmIpt_before);
+            console.log("转换后：",hhIpt_after,mmIpt_after);
+            totalSeconds_ipt = hhIpt_after * 3600 + mmIpt_after * 60;
+            console.log("总秒数：",totalSeconds_ipt);
+        }
+    }
+    Connections{//弹出时间输入的倒计时启动按钮链接
+        target: timeIptWin.startBtnArea
+        onClicked:{
+            timeIptPop.close()
+            timer_2.start()
+        }
+    }
+    Connections{//告警窗口关闭  倒计时停止
+        target: warnMsgPop.closeWarn
+        onClicked:{
+            timer_2.stop()
+            warnMsgPop.close()
+            count = 15
+        }
+    }
+}
+
+
+
+
+
+
+
+import QtQuick 2.0
+import QtQuick.Window 2.3
+import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.2
+import QtQuick.Dialogs 1.1
+Rectangle{//自定义时间输入窗口
+   id:root
+   property int txtFieldWidth: 100
+   property int txtFieldHeight: 35
+   property int btnWidth: 70
+   property int btnHeight: 40
+   property alias confirmBtnArea: confirmBtn
+   property alias startBtnArea: startBtn
+   property alias warnMsgInput: warnMsgInput.text
+   property alias timeInputText: timerInputText.text
+   width: parent.width
+   height: parent.height
+   ColumnLayout{
+       spacing: 3
+       anchors.horizontalCenter: parent.horizontalCenter
+       Text{
+           text: "Please enter time:"
+           font.pointSize: 12
+           color: "#C23B07"
+       }
+       TextField{
+             id:timerInputText
+             implicitWidth: root.width-5
+             validator: RegExpValidator{regExp: /^(?:(?:[0-2][0-3])|(?:[0-1][0-9])):[0-5][0-9]$/}
+             Keys.enabled: true
+             Keys.onReturnPressed: {
+                 if(timerInputText.text === ""){
+                     hintTimeIpt.open()
+                     timerInputText.focus = false
+                 }else{
+                     warnMsgInput.focus = true
+                     countDownTex.text = timerInputText.text
+                 }
+             }
+         }
+       Text{//输入告警信息
+           text:"Please Enter Warning Msg："
+           font.pointSize: 12
+           color: "#C23B07"
+       }
+       TextField{
+           id:warnMsgInput
+           implicitWidth: root.width-5
+           Keys.enabled: true
+           Keys.onReturnPressed: {
+               if(warnMsgInput.text === ""){
+                   hintWarnIpt.open()
+                   warnMsgInput.focus = false
+               }
+           }
+       }
+       Row{
+           anchors.horizontalCenter: parent.horizontalCenter
+           spacing: 10
+           Button{//确认按钮
+               id:confirmBtn
+               width: btnWidth
+               height: btnHeight
+               text: "Confirm"
+               onClicked: {
+                   if(timerInputText.text === " " || warnMsgInput.text === ""){
+                       hintTimeIpt.open()
+                       timerInputText.focus = false
+                       warnMsgInput.focus = false
+                   }else{
+                       countDownTex.text = timerInputText.text
+                   }
+               }
+           }
+           Button{//倒计时开始
+               id:startBtn
+               width: btnWidth
+               height: btnHeight
+               text: "Start"
+           }
+       }
+   }
+   WarnPop{
+       id:hintTimeIpt
+       x:root.x+root.width/3
+       y:root.y
+       warnText: "Please enter time!"
+   }
+   WarnPop{
+       id:hintWarnIpt
+       x:root.x+root.width/3
+       y:root.y
+       warnText: "Please enter Warning Message!"
+   }
+   Connections{
+       target: hintTimeIpt.closeWarn
+       onClicked:{
+           hintTimeIpt.close()
+       }
+   }
+   Connections{
+       target: hintWarnIpt.closeWarn
+       onClicked:{
+           hintWarnIpt.close()
+       }
+   }
+}
+
+
+
+
+import QtQuick 2.0
+import QtQuick.Controls 2.2
+Dialog{
+    id:delDialog
+    property alias warnText: warnText.text
+    property alias closeWarn: confirm
+    width: 120
+    height: 160
+    background: Rectangle{
+        color: "#ECF0F1"
+        anchors.fill: parent
+    }
+    header: Rectangle{
+        width: delDialog.width
+        height: 50
+        border.color: "#ECF0F1"
+        Image{
+            width: 30
+            height: 30
+            anchors.centerIn: parent
+            source: "qrc:/warning.png"
+        }
+    }
+    contentItem: Rectangle{
+        border.color: "#ECF0F1"
+        color: "#ECF0F1"
+        Text{
+            id:warnText
+            anchors.fill: parent
+            anchors.centerIn: parent
+            font.family: "Microsoft Yahei"
+            text: ""
+            wrapMode: Text.WordWrap
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+        }
+    }
+    footer: Rectangle{
+        width: delDialog.width
+        height: 50
+        border.color: "#ECF0F1"
+        color: "#ECF0F1"
+        Button{
+            id:confirm
+            width:  80
+            height:  30
+            anchors.centerIn: parent
+            text:  "Confirm"
+        }
+    }
+}

@@ -1,0 +1,6 @@
+在标准c++中，使用string类来存储字符串
+在qt中，使用QString类来存储字符串
+
+
+从c++的string到qt的QString  ：  QString aa = QString::fromStdString(a);
+从QString到c++的string	   ：   string a = aa.toStdString();
